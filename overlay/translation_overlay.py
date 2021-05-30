@@ -87,7 +87,7 @@ if __name__ == '__main__':
     argc.add_argument("-f", "--file_path", type=str, help="pass the path for translation overlay")
 
     argp = argc.parse_args()
-    ovl = TranslationOverlay(argp.file_path)
+    ovl = TranslationOverlay()
 
-    image_names = ovl.create_image_with_translation_overlay()
+    image_names = ovl.create_image_with_translation_overlay(argp.file_path)
     print(image_names)
