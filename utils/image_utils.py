@@ -70,7 +70,7 @@ def overlay_image_as_paragraphs(image_path, para_details):
         # height allocation for each line (spacing each line of the para equally)
         h = int((int(y3) - int(y0)) / len(translated_para_lines))
 
-        if float(font_height) < (float(h) * .8):
+        if float(font_height) < (float(h) * .7):
             font_height = int(h * .8)
 
         font = ImageFont.truetype("fonts/Aaargh.ttf", font_height)
