@@ -1,15 +1,13 @@
 import argparse
 import os
 
+import pytesseract
+from PIL import Image
 from pdf2image import convert_from_path
 
 from api.google.vision_api import GoogleVisionApis
 from utils.image_utils import overlay_image_as_paragraphs
 from utils.ocr_utils import get_paragraph_details_from_annotations
-
-from PIL import Image
-
-import pytesseract
 
 OVERLAY_IMAGE_PATH = os.environ['OVERLAY_IMAGE_PATH']
 OVERLAY_PDF_PATH = os.environ['OVERLAY_PDF_PATH']
@@ -17,19 +15,18 @@ TEMP_FOLDER = os.environ['TEMP_FOLDER']
 
 
 class TranslationOverlay:
-    def __init__(self, image_path):
-        self.image_path = image_path
+    def __init__(self):
         self.google_api = GoogleVisionApis()
 
-    def create_image_with_translation_overlay(self):
+    def create_image_with_translation_overlay(self, image_path):
         # if file is pdf, then get the jpeg files
         image_list = []
-        if self.image_path.endswith('.pdf'):
-            image_list = convert_from_path(self.image_path, output_folder=TEMP_FOLDER, paths_only=True)
+        if image_path.endswith('.pdf'):
+            image_list = convert_from_path(image_path, output_folder=TEMP_FOLDER, paths_only=True)
 
         else:
             # check image orientation
-            image = Image.open(self.image_path)
+            image = Image.open(image_path)
             image_osd = pytesseract.image_to_osd(image)
             rotate = 0
             for osd in image_osd.split('\n'):
@@ -38,9 +35,9 @@ class TranslationOverlay:
 
             if rotate != 0:
                 image = image.rotate(rotate, expand=True)
-                image.save(self.image_path)
+                image.save(image_path)
 
-            image_list.append(self.image_path)
+            image_list.append(image_path)
 
         # get the ocr from google API
         response_json_list = []
@@ -62,18 +59,17 @@ class TranslationOverlay:
             # create overlayed image from the paragraph bbox
             for key, page_para_details in pages_as_para.items():
                 overlay_file_paths.append(overlay_image_as_paragraphs(f_path, page_para_details))
- 
 
-        if self.image_path.endswith('.pdf'):
+        if image_path.endswith('.pdf'):
             # clean the temp folder
             for f in image_list:
                 os.remove(f)
-                
-            return self.save_images_as_pdf(overlay_file_paths)
+
+            return self.save_images_as_pdf(overlay_file_paths, image_path.split('/')[-1])
 
         return overlay_file_paths
 
-    def save_images_as_pdf(self, image_names):
+    def save_images_as_pdf(self, image_names, f_name):
         image_list = []
 
         for name in image_names[1:]:
@@ -81,10 +77,7 @@ class TranslationOverlay:
             image_list.append(im)
 
         main_im = Image.open(image_names[0])
-
-        f_name = self.image_path.split('/')[-1]
-
-        main_im.save('{}{}'.format(OVERLAY_PDF_PATH, f_name), save_all=True, append_images=image_list) 
+        main_im.save('{}{}'.format(OVERLAY_PDF_PATH, f_name), save_all=True, append_images=image_list)
 
         return '{}{}'.format(OVERLAY_PDF_PATH, f_name)
 

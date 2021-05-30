@@ -8,12 +8,12 @@ from googletrans import Translator
 from api.google.vision_api import GoogleVisionApis
 from utils.ocr_utils import get_paragraph_details_from_annotations
 
-
 translator = Translator()
 
 OVERLAY_IMAGE_PATH = os.environ['OVERLAY_IMAGE_PATH']
 
 FONT_HEIGHT_THRESHOLD = 0.8
+
 
 def overlay_image_as_paragraphs(image_path, para_details):
     f_name = image_path.split('/')[-1].split('.')[0]
