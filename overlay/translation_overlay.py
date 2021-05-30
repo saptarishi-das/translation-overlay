@@ -41,8 +41,8 @@ class TranslationOverlay:
 
         # get the ocr from google API
         response_json_list = []
-        for idx, image_path in enumerate(image_list):
-            response = self.google_api.request_ocr([image_path])
+        for idx, img in enumerate(image_list):
+            response = self.google_api.request_ocr([img])
 
             if response.status_code != 200 or response.json().get('error'):
                 raise Exception(response.text)

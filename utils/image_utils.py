@@ -47,8 +47,8 @@ def overlay_image_as_paragraphs(image_path, para_details):
         x2, y2 = bbox['vertices'][2]['x'], bbox['vertices'][2]['y']
         x3, y3 = bbox['vertices'][3]['x'], bbox['vertices'][3]['y']
 
-        box_height = abs(int(y2) - int(y1))
-        box_width = abs(int(x1) - int(x0))
+        # box_height = abs(int(y2) - int(y1))
+        # box_width = abs(int(x1) - int(x0))
 
         para_lines = para['para_lines']
 
@@ -73,8 +73,8 @@ def overlay_image_as_paragraphs(image_path, para_details):
         font = ImageFont.truetype("fonts/Aaargh.ttf", font_height)
 
         # font orientation
-        if box_height > box_width:
-            font = ImageFont.TransposedFont(font, orientation=Image.ROTATE_90)
+        # if box_height > box_width:
+        #     font = ImageFont.TransposedFont(font, orientation=Image.ROTATE_90)
 
         for line in translated_para_lines:
             draw.text((x0, y0), line, 'purple', font=font)
