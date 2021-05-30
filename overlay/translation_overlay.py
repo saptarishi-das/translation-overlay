@@ -7,7 +7,10 @@ from api.google.vision_api import GoogleVisionApis
 from utils.image_utils import overlay_image_as_paragraphs
 from utils.ocr_utils import get_paragraph_details_from_annotations
 
+from PIL import Image
+
 OVERLAY_IMAGE_PATH = os.environ['OVERLAY_IMAGE_PATH']
+OVERLAY_PDF_PATH = os.environ['OVERLAY_PDF_PATH']
 TEMP_FOLDER = os.environ['TEMP_FOLDER']
 
 
@@ -46,7 +49,25 @@ class TranslationOverlay:
             for key, page_para_details in pages_as_para.items():
                 overlay_file_paths.append(overlay_image_as_paragraphs(f_path, page_para_details))
 
-        print(overlay_file_paths)
+        if self.image_path.endswith('.pdf'):
+            return self.save_images_as_pdf(overlay_file_paths)
+
+        return overlay_file_paths
+
+    def save_images_as_pdf(self, image_names):
+        image_list = []
+
+        for name in image_names[1:]:
+            im = Image.open(name)
+            image_list.append(im)
+
+        main_im = Image.open(image_names[0])
+
+        f_name = self.image_path.split('/')[-1]
+
+        main_im.save('{}{}'.format(OVERLAY_PDF_PATH, f_name), save_all=True, append_images=image_list) 
+
+        return '{}{}'.format(OVERLAY_PDF_PATH, f_name)
 
 
 if __name__ == '__main__':
@@ -55,4 +76,6 @@ if __name__ == '__main__':
 
     argp = argc.parse_args()
     ovl = TranslationOverlay(argp.file_path)
-    ovl.create_image_with_translation_overlay()
+
+    image_names = ovl.create_image_with_translation_overlay()
+    print(image_names)
