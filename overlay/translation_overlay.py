@@ -79,6 +79,8 @@ class TranslationOverlay:
         main_im = Image.open(image_names[0])
         main_im.save('{}{}'.format(OVERLAY_PDF_PATH, f_name), save_all=True, append_images=image_list)
 
+        # clean up the image file?
+
         return '{}{}'.format(OVERLAY_PDF_PATH, f_name)
 
 
