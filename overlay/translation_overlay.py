@@ -36,14 +36,17 @@ class TranslationOverlay:
             response_json_list.append(response.json()['responses'])
 
         # get the ocr json for each of the images
+        overlay_file_paths = []
         for idx, response_json in enumerate(response_json_list):
             # get the paragraph bbox dict for each page
-            pages_as_para = get_paragraph_details_from_annotations(response_json['fullTextAnnotation'])
+            pages_as_para = get_paragraph_details_from_annotations(response_json[0]['fullTextAnnotation'])
             f_path = image_list[idx]
 
             # create overlayed image from the paragraph bbox
             for key, page_para_details in pages_as_para.items():
-                overlay_image_as_paragraphs(f_path, page_para_details)
+                overlay_file_paths.append(overlay_image_as_paragraphs(f_path, page_para_details))
+
+        print(overlay_file_paths)
 
 
 if __name__ == '__main__':
