@@ -52,7 +52,6 @@ def overlay_image_as_paragraphs(image_path, para_details):
 
         # get the mean font height
         font_height = abs(int(statistics.mean([l['line_height'] for l in para_lines])))
-        font = ImageFont.truetype("fonts/Aaargh.ttf", font_height)
 
         # TODO - get font height based on the rect width
 
@@ -70,6 +69,11 @@ def overlay_image_as_paragraphs(image_path, para_details):
 
         # height allocation for each line (spacing each line of the para equally)
         h = int((int(y3) - int(y0)) / len(translated_para_lines))
+
+        if float(font_height) < (float(h) * .8):
+            font_height = int(h * .8)
+
+        font = ImageFont.truetype("fonts/Aaargh.ttf", font_height)
 
         for line in translated_para_lines:
             draw.text((x0, y0), line, 'purple', font=font)
