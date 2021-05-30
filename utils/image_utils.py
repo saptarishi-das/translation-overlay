@@ -8,6 +8,8 @@ from googletrans import Translator
 from api.google.vision_api import GoogleVisionApis
 from utils.ocr_utils import get_paragraph_details_from_annotations
 
+import pytesseract
+
 translator = Translator()
 
 OVERLAY_IMAGE_PATH = os.environ['OVERLAY_IMAGE_PATH']
@@ -20,6 +22,16 @@ def overlay_image_as_paragraphs(image_path, para_details):
     image = image.convert('RGB')
     draw = ImageDraw.Draw(image)
     vision_api = GoogleVisionApis()
+
+    # check image orientation
+    image_osd = pytesseract.image_to_osd(image)
+    rotate = 0
+    for osd in image_osd.split('\n'):
+        if osd.split[':'][0].strip() == 'Orientation in degrees':
+            rotate = int(osd.split[':'][1].strip())
+
+    if rotate != 0:
+        image = image.rotate(rotate)
 
     # first draw the paragraph rectangles (to avoid overlaps)
     for para in para_details:
@@ -53,11 +65,6 @@ def overlay_image_as_paragraphs(image_path, para_details):
         # get the mean font height
         font_height = abs(int(statistics.mean([l['line_height'] for l in para_lines])))
 
-        # TODO - get font height based on the rect width
-
-        if box_height > box_width:
-            font = ImageFont.TransposedFont(font, orientation=Image.ROTATE_90)
-
         # get the translated text for the complete para
         para_lines_list = [l['line_text'] for l in para_lines]
         response = vision_api.request_translation(para_lines_list)
@@ -74,6 +81,10 @@ def overlay_image_as_paragraphs(image_path, para_details):
             font_height = int(h * .7)
 
         font = ImageFont.truetype("fonts/Aaargh.ttf", font_height)
+
+        # font orientation
+        if box_height > box_width:
+            font = ImageFont.TransposedFont(font, orientation=Image.ROTATE_90)
 
         for line in translated_para_lines:
             draw.text((x0, y0), line, 'purple', font=font)

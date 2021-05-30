@@ -9,4 +9,4 @@ google-cloud-vision
 google-cloud-language
 google-cloud-translate==2.0.1
 google-api-python-client
-
+pytesseract
