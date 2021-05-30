@@ -8,7 +8,6 @@ from googletrans import Translator
 from api.google.vision_api import GoogleVisionApis
 from utils.ocr_utils import get_paragraph_details_from_annotations
 
-import pytesseract
 
 translator = Translator()
 
@@ -22,16 +21,6 @@ def overlay_image_as_paragraphs(image_path, para_details):
     image = image.convert('RGB')
     draw = ImageDraw.Draw(image)
     vision_api = GoogleVisionApis()
-
-    # check image orientation
-    image_osd = pytesseract.image_to_osd(image)
-    rotate = 0
-    for osd in image_osd.split('\n'):
-        if osd.split[':'][0].strip() == 'Orientation in degrees':
-            rotate = int(osd.split[':'][1].strip())
-
-    if rotate != 0:
-        image = image.rotate(rotate)
 
     # first draw the paragraph rectangles (to avoid overlaps)
     for para in para_details:

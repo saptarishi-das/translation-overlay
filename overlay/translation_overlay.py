@@ -9,6 +9,8 @@ from utils.ocr_utils import get_paragraph_details_from_annotations
 
 from PIL import Image
 
+import pytesseract
+
 OVERLAY_IMAGE_PATH = os.environ['OVERLAY_IMAGE_PATH']
 OVERLAY_PDF_PATH = os.environ['OVERLAY_PDF_PATH']
 TEMP_FOLDER = os.environ['TEMP_FOLDER']
@@ -26,6 +28,18 @@ class TranslationOverlay:
             image_list = convert_from_path(self.image_path, output_folder=TEMP_FOLDER, paths_only=True)
 
         else:
+            # check image orientation
+            image = Image.open(self.image_path)
+            image_osd = pytesseract.image_to_osd(image)
+            rotate = 0
+            for osd in image_osd.split('\n'):
+                if osd.split(':')[0].strip() == 'Orientation in degrees':
+                    rotate = int(osd.split(':')[1].strip())
+
+            if rotate != 0:
+                image = image.rotate(rotate, expand=True)
+                image.save(self.image_path)
+
             image_list.append(self.image_path)
 
         # get the ocr from google API
@@ -48,8 +62,13 @@ class TranslationOverlay:
             # create overlayed image from the paragraph bbox
             for key, page_para_details in pages_as_para.items():
                 overlay_file_paths.append(overlay_image_as_paragraphs(f_path, page_para_details))
+ 
 
         if self.image_path.endswith('.pdf'):
+            # clean the temp folder
+            for f in image_list:
+                os.remove(f)
+                
             return self.save_images_as_pdf(overlay_file_paths)
 
         return overlay_file_paths
