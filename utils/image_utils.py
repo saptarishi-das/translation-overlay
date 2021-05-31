@@ -15,6 +15,17 @@ OVERLAY_IMAGE_PATH = os.environ['OVERLAY_IMAGE_PATH']
 FONT_HEIGHT_THRESHOLD = 0.8
 
 
+def get_bbox(para):
+    bbox = para['bbox']
+    x0, y0 = bbox['vertices'][0]['x'] if bbox['vertices'][0].get('x', None) else bbox['vertices'][3]['x'], \
+             bbox['vertices'][0]['y']
+    x1, y1 = bbox['vertices'][1]['x'], bbox['vertices'][1]['y']
+    x2, y2 = bbox['vertices'][2]['x'], bbox['vertices'][2]['y']
+    x3, y3 = bbox['vertices'][3]['x'], bbox['vertices'][3]['y']
+
+    return x0, y0, x1, y1, x2, y2, x3, y3
+
+
 def overlay_image_as_paragraphs(image_path, para_details):
     f_name = image_path.split('/')[-1].split('.')[0]
     overlay_image = '{}{}.jpeg'.format(OVERLAY_IMAGE_PATH, f_name)
@@ -25,35 +36,20 @@ def overlay_image_as_paragraphs(image_path, para_details):
 
     # first draw the paragraph rectangles (to avoid overlaps)
     for para in para_details:
-        bbox = para['bbox']
-
-        # TODO - find a better way
-        x0, y0 = bbox['vertices'][0]['x'] if bbox['vertices'][0].get('x', None) else bbox['vertices'][3]['x'], \
-                 bbox['vertices'][0]['y']
-        x1, y1 = bbox['vertices'][1]['x'], bbox['vertices'][1]['y']
-        x2, y2 = bbox['vertices'][2]['x'], bbox['vertices'][2]['y']
-        x3, y3 = bbox['vertices'][3]['x'], bbox['vertices'][3]['y']
-
+        x0, y0, x1, y1, x2, y2, x3, y3 = get_bbox(para)
         draw.rectangle([(x0, y0), (x2, y2)], fill='palegreen')
 
     # write the text on each of the rectangles
     for para in para_details:
-        bbox = para['bbox']
-
-        # TODO - find a better way
-        x0, y0 = bbox['vertices'][0]['x'] if bbox['vertices'][0].get('x', None) else bbox['vertices'][3]['x'], \
-                 bbox['vertices'][0]['y']
-        x1, y1 = bbox['vertices'][1]['x'], bbox['vertices'][1]['y']
-        x2, y2 = bbox['vertices'][2]['x'], bbox['vertices'][2]['y']
-        x3, y3 = bbox['vertices'][3]['x'], bbox['vertices'][3]['y']
-
-        # box_height = abs(int(y2) - int(y1))
-        # box_width = abs(int(x1) - int(x0))
+        x0, y0, x1, y1, x2, y2, x3, y3 = get_bbox(para)
 
         para_lines = para['para_lines']
 
         # get the mean font height
         font_height = abs(int(statistics.mean([l['line_height'] for l in para_lines])))
+
+        # get the origin of each line
+        line_origin_list = [l['origin'] for l in para_lines]
 
         # get the translated text for the complete para
         para_lines_list = [l['line_text'] for l in para_lines]
@@ -72,12 +68,9 @@ def overlay_image_as_paragraphs(image_path, para_details):
 
         font = ImageFont.truetype("fonts/Aaargh.ttf", font_height)
 
-        # font orientation
-        # if box_height > box_width:
-        #     font = ImageFont.TransposedFont(font, orientation=Image.ROTATE_90)
-
-        for line in translated_para_lines:
-            draw.text((x0, y0), line, 'purple', font=font)
+        for idx, line in enumerate(translated_para_lines):
+            ox, oy = line_origin_list[idx]
+            draw.text((ox, y0), line, 'purple', font=font)
             y0 = y0 + h
 
     image.save(overlay_image)
@@ -85,10 +78,10 @@ def overlay_image_as_paragraphs(image_path, para_details):
 
 
 if __name__ == '__main__':
-    ocr_json_data = json.load(open('tests/output/jsons/0002.jpg.json', 'r'))
+    ocr_json_data = json.load(open('extracted_jsons/centered_text_image.json', 'r'))
     pages_as_para = get_paragraph_details_from_annotations(ocr_json_data['fullTextAnnotation'])
 
-    image_path = 'tests/input/0002.jpg'
+    image_path = 'input/centered_text_image.png'
 
     for key, page_para_details in pages_as_para.items():
         overlay_image_as_paragraphs(image_path, page_para_details)

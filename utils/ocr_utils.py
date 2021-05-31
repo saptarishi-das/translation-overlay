@@ -9,14 +9,18 @@ def get_paragraph_details_from_annotations(annotation):
 
         for block in page['blocks']:
             for paragraph in block['paragraphs']:
-                para = ""
-                line = ""
+                para = ''
+                line = ''
                 lines = []
+                origin = ''
                 for word in paragraph['words']:
-
                     word_bbox = word.get('boundingBox')
                     word_height = word_bbox.get('vertices')[2].get('y') - word_bbox.get('vertices')[1].get(
                         'y')  # (y2 - y1)
+
+                    # get the start of each line
+                    if not line:
+                        origin = (word_bbox.get('vertices')[0].get('x')), word_bbox.get('vertices')[0].get('y')
 
                     for symbol in word['symbols']:
                         line += symbol['text']
@@ -30,7 +34,8 @@ def get_paragraph_details_from_annotations(annotation):
                                 # lines.append(line)
                                 lines.append({
                                     'line_height': word_height,
-                                    'line_text': line
+                                    'line_text': line,
+                                    'origin': origin
                                 })
                                 para += '{}\n'.format(line)
                                 line = ''
@@ -38,13 +43,11 @@ def get_paragraph_details_from_annotations(annotation):
                                 # lines.append(line)
                                 lines.append({
                                     'line_height': word_height,
-                                    'line_text': line
+                                    'line_text': line,
+                                    'origin': origin
                                 })
                                 para += line
                                 line = ''
-
-                    # TODO - height of the line? (for font of overlay text)
-                # paragraphs.append(para)
 
                 para_details = {
                     'bbox': paragraph.get('boundingBox'),
