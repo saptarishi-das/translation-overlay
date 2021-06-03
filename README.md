@@ -9,5 +9,11 @@ You will need a Google API key to use this. Google API key is not free :(
 2. Python
 
 # Setting up
-Clone the project and install the requirements.txt file. 
-TODO - complete writing this readme
+1. Clone the project and install the requirements.txt file. 
+2. Setup env variables:
+    OVERLAY_IMAGE_PATH=output/image_with_overlay/
+    TEMP_FOLDER=temp/
+    OVERLAY_PDF_PATH=output/pdf_with_overlay/
+    GOOGLE_API_KEY=<API_KEY>
+3. Check the emulator.py file to run the code.
+  
