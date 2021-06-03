@@ -30,7 +30,7 @@ class TranslationOverlay:
             image_osd = pytesseract.image_to_osd(image)
             rotate = 0
             for osd in image_osd.split('\n'):
-                if osd.split(':')[0].strip() == 'Orientation in degrees':
+                if osd.split(':')[0].strip() == 'Rotate':
                     rotate = int(osd.split(':')[1].strip())
 
             if rotate != 0:
