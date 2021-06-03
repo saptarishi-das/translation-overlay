@@ -37,7 +37,7 @@ def overlay_image_as_paragraphs(image_path, para_details):
     # first draw the paragraph rectangles (to avoid overlaps)
     for para in para_details:
         x0, y0, x1, y1, x2, y2, x3, y3 = get_bbox(para)
-        draw.rectangle([(x0, y0), (x2, y2)], fill='palegreen')
+        draw.rectangle([(x0, y0), (x2, y2)], fill='lightgrey')
 
     # write the text on each of the rectangles
     for para in para_details:
