@@ -35,7 +35,7 @@ class TranslationOverlay:
 
             if rotate != 0:
                 image = image.rotate(rotate, expand=True)
-                image.save(image_path)
+                # image.save(image_path)
 
             image_list.append(image_path)
 
