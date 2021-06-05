@@ -12,7 +12,7 @@ translator = Translator()
 
 OVERLAY_IMAGE_PATH = os.environ['OVERLAY_IMAGE_PATH']
 
-FONT_HEIGHT_THRESHOLD = 0.65
+FONT_HEIGHT_THRESHOLD = 0.75
 
 
 def get_bbox(para):
