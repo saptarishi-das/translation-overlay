@@ -35,6 +35,11 @@ class TranslationOverlay:
 
             if rotate != 0:
                 image = image.rotate(rotate, expand=True)
+
+                f_name = image_path.split('/')[-1]
+
+                # update image path to save in TEMP folder
+                image_path = '{}{}'.format(TEMP_FOLDER, f_name)
                 image.save(image_path)
 
             image_list.append(image_path)
@@ -60,11 +65,12 @@ class TranslationOverlay:
             for key, page_para_details in pages_as_para.items():
                 overlay_file_paths.append(overlay_image_as_paragraphs(f_path, page_para_details))
 
-        if image_path.endswith('.pdf'):
-            # clean the temp folder
-            for f in image_list:
-                os.remove(f)
 
+        # clean the temp folder
+        for f in image_list:
+            os.remove(f)
+
+        if image_path.endswith('.pdf'):
             return self.save_images_as_pdf(overlay_file_paths, image_path.split('/')[-1])
 
         return overlay_file_paths
@@ -80,6 +86,8 @@ class TranslationOverlay:
         main_im.save('{}{}'.format(OVERLAY_PDF_PATH, f_name), save_all=True, append_images=image_list)
 
         # clean up the image file?
+        for f in image_names:
+            os.remove(f)
 
         return '{}{}'.format(OVERLAY_PDF_PATH, f_name)
 

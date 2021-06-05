@@ -12,7 +12,7 @@ translator = Translator()
 
 OVERLAY_IMAGE_PATH = os.environ['OVERLAY_IMAGE_PATH']
 
-FONT_HEIGHT_THRESHOLD = 0.8
+FONT_HEIGHT_THRESHOLD = 0.65
 
 
 def get_bbox(para):
@@ -63,8 +63,8 @@ def overlay_image_as_paragraphs(image_path, para_details):
         # height allocation for each line (spacing each line of the para equally)
         h = int((int(y3) - int(y0)) / len(translated_para_lines))
 
-        if float(font_height) < (float(h) * FONT_HEIGHT_THRESHOLD):
-            font_height = int(h * FONT_HEIGHT_THRESHOLD)
+        # if float(font_height) < (float(h) * FONT_HEIGHT_THRESHOLD):
+        font_height = int(h * FONT_HEIGHT_THRESHOLD)
 
         font = ImageFont.truetype("fonts/Aaargh.ttf", font_height)
 
